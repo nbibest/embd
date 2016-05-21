@@ -15,6 +15,8 @@ import (
 	"github.com/kidoman/embd"
 )
 
+const timeoutInterval = 10000000
+
 type digitalPin struct {
 	id string
 	n  int
@@ -165,6 +167,8 @@ func (p *digitalPin) TimePulse(state int) (time.Duration, error) {
 		aroundState = embd.High
 	}
 
+	initTime := time.Now()
+
 	// Wait for any previous pulse to end
 	for {
 		v, err := p.read()
@@ -174,6 +178,10 @@ func (p *digitalPin) TimePulse(state int) (time.Duration, error) {
 
 		if v == aroundState {
 			break
+		}
+
+		if time.Since(initTime).Nanoseconds() > timeoutInterval {
+			return 0, nil
 		}
 	}
 
@@ -186,6 +194,10 @@ func (p *digitalPin) TimePulse(state int) (time.Duration, error) {
 
 		if v == state {
 			break
+		}
+
+		if time.Since(initTime).Nanoseconds() > timeoutInterval {
+			return 0, nil
 		}
 	}
 
@@ -200,6 +212,10 @@ func (p *digitalPin) TimePulse(state int) (time.Duration, error) {
 
 		if v == aroundState {
 			break
+		}
+
+		if time.Since(initTime).Nanoseconds() > timeoutInterval {
+			return 0, nil
 		}
 	}
 
